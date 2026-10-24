@@ -151,7 +151,7 @@ function isUpToDate() {
   if (!fs.existsSync(OUTPUT_FILE)) return false
 
   let newestSource = fs.statSync(path.join(CPP_DIR, 'CMakeLists.txt')).mtimeMs
-  for (const directory of ['src', 'include', 'third_party']) {
+  for (const directory of ['src', 'include']) {
     newestSource = collectSourceStats(path.join(CPP_DIR, directory), newestSource)
   }
 

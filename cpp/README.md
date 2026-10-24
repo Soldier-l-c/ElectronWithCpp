@@ -13,6 +13,34 @@ int cpp_deinit(const char *config_json);
 
 两个接口都只接收一个 UTF-8 JSON 对象字符串，返回整数状态码。JSON 顶层必须是对象，最大 64 KiB。
 
+## 依赖
+
+JSON 解析使用 RapidJSON，不引入其他 JSON 库，也不在本目录复制第三方源码。
+
+CMake 按以下顺序查找 RapidJSON：
+
+1. 命令行或缓存变量 `RAPIDJSON_INCLUDE_DIR`
+2. `SOLDIERS_3RD/rapidjson/include`
+3. `SOLDIERS_3RD/rapidjson`
+4. `SOLDIERS_3RD/include`
+5. 系统默认头文件路径
+
+本机环境变量：
+
+```text
+SOLDIERS_3RD=D:\GitResponse\GitHub\ThirdParty
+```
+
+后续新增第三方库时，优先使用 `SOLDIERS_3RD` 中已有的库。
+
+## 代码风格
+
+C++ 使用 Allman 大括号风格，所有代码块 `{` 独立成行。仓库根目录的 `.clang-format` 已配置好，可直接执行：
+
+```bash
+clang-format -i cpp/include/*.h cpp/src/*.cpp
+```
+
 ## 构建
 
 ### Windows / Visual Studio 2019
@@ -43,6 +71,13 @@ bash scripts/build.sh
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel
+```
+
+如果 CMake 找不到 RapidJSON：
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
+  -DRAPIDJSON_INCLUDE_DIR=/path/to/rapidjson/include
 ```
 
 ### 输出

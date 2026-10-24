@@ -33,7 +33,6 @@ ElectronWithCpp/
 ├─ cpp/                       # C++ 原生层，独立于界面构建
 │  ├─ include/cpp_core.h      # 对外 C ABI
 │  ├─ src/cpp_core.cpp        # 初始化 / 反初始化实现
-│  ├─ third_party/nlohmann/   # JSON 单头文件依赖（MIT）
 │  ├─ scripts/
 │  │  ├─ generate-vs2019.bat  # 双击一键生成 VS2019 工程
 │  │  ├─ generate-vs2019.ps1
@@ -44,6 +43,7 @@ ElectronWithCpp/
 ├─ scripts/                   # 开发启动、原生预构建、接口测试
 ├─ build/                     # 安装包图标等构建资源
 ├─ docs/                      # 文档图片
+├─ .clang-format              # C++ Allman 大括号风格
 └─ electron-builder.config.cjs
 ```
 
@@ -54,8 +54,29 @@ ElectronWithCpp/
 - Windows：Visual Studio 2019，安装「使用 C++ 的桌面开发」工作负载
 - Linux：CMake 3.16+、GCC/Clang
 - macOS：Xcode Command Line Tools、CMake 3.16+
+- C++ 第三方依赖：RapidJSON（header-only）
 
 Windows 上不要求单独安装 CMake：`scripts/build-native.cjs` 会自动查找 VS2019 自带的 CMake。
+
+本机的第三方库统一放在 `SOLDIERS_3RD` 环境变量指向的目录：
+
+```text
+SOLDIERS_3RD=D:\GitResponse\GitHub\ThirdParty
+```
+
+当前 C++ 代码从以下位置查找 RapidJSON：
+
+```text
+%SOLDIERS_3RD%\rapidjson\include\rapidjson\document.h
+```
+
+也可以通过 CMake 参数显式指定：
+
+```powershell
+cmake -S cpp -B cpp/build -DRAPIDJSON_INCLUDE_DIR="$env:SOLDIERS_3RD/rapidjson/include"
+```
+
+后续新增第三方库时，优先复用 `SOLDIERS_3RD` 中已有的库，不在仓库里重复引入或复制第三方源码。
 
 ## 快速开始
 
@@ -146,7 +167,7 @@ int cpp_deinit(const char *config_json);
 | 4 | `CPP_CORE_ERR_NOT_INITIALIZED` | 未初始化时调用反初始化 |
 | 5 | `CPP_CORE_ERR_INTERNAL` | C++ 内部异常 |
 
-JSON 解析使用随源码内置的 `nlohmann/json` 单头文件（MIT），C++ 工程构建不依赖网络。
+JSON 解析使用 RapidJSON（header-only）。CMake 优先从 `SOLDIERS_3RD/rapidjson/include` 发现头文件，也可通过 `RAPIDJSON_INCLUDE_DIR` 指定；不引入其他 JSON 库，也不在仓库中复制 RapidJSON 源码。
 
 ## 构建原生库
 

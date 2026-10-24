@@ -29,13 +29,50 @@ endif()
 set(CPP_CORE_OUTPUT_DIR
     "${CMAKE_CURRENT_SOURCE_DIR}/bin/${CPP_CORE_PLATFORM}/${CPP_CORE_ARCH}")
 
+# RapidJSON is header-only and lives in the shared third-party directory on this
+# machine. RAPIDJSON_INCLUDE_DIR takes precedence for other environments.
+set(RAPIDJSON_INCLUDE_DIR "" CACHE PATH "Directory containing rapidjson/document.h")
+if(NOT RAPIDJSON_INCLUDE_DIR)
+    set(RAPIDJSON_HINTS "")
+    if(DEFINED ENV{SOLDIERS_3RD})
+        list(APPEND RAPIDJSON_HINTS
+            "$ENV{SOLDIERS_3RD}/rapidjson/include"
+            "$ENV{SOLDIERS_3RD}/rapidjson"
+            "$ENV{SOLDIERS_3RD}/include"
+            "$ENV{SOLDIERS_3RD}"
+        )
+    endif()
+
+    find_path(_RAPIDJSON_INCLUDE_DIR
+        NAMES rapidjson/document.h
+        HINTS ${RAPIDJSON_HINTS}
+        DOC "Directory containing rapidjson/document.h"
+    )
+    if(_RAPIDJSON_INCLUDE_DIR)
+        set(RAPIDJSON_INCLUDE_DIR "${_RAPIDJSON_INCLUDE_DIR}" CACHE PATH
+            "Directory containing rapidjson/document.h" FORCE)
+    endif()
+endif()
+
+if(NOT RAPIDJSON_INCLUDE_DIR)
+    message(FATAL_ERROR
+        "RapidJSON was not found. Set SOLDIERS_3RD to the third-party root "
+        "or set RAPIDJSON_INCLUDE_DIR to the directory containing rapidjson/document.h."
+    )
+endif()
+
+message(STATUS "RapidJSON include: ${RAPIDJSON_INCLUDE_DIR}")
+
 add_library(cpp_core SHARED
     src/cpp_core.cpp
 )
 
 target_include_directories(cpp_core
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
-    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/third_party"
+)
+
+target_include_directories(cpp_core
+    SYSTEM PRIVATE "${RAPIDJSON_INCLUDE_DIR}"
 )
 
 target_compile_definitions(cpp_core PRIVATE CPP_CORE_EXPORTS)
