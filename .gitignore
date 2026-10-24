@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Renderer output
+dist/
+
+# Installer output
+release/
+
+# Native build output
+cpp/build/
+cpp/bin/
+
+# Local caches and test artifacts
+.npm-cache/
+.cache/
+artifacts/
+.tmp-*
+*.log
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

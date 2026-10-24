@@ -1,0 +1,37 @@
+{
+  "name": "electron-with-cpp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Electron + Vue 2 desktop application with a cross-platform C++ core loaded through koffi",
+  "main": "electron/main.js",
+  "author": "ElectronWithCpp",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.12.0",
+    "npm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.cjs",
+    "predev": "node scripts/build-native.cjs --if-needed",
+    "build": "vite build",
+    "build:native": "node scripts/build-native.cjs",
+    "generate:vs2019": "powershell -NoProfile -ExecutionPolicy Bypass -File cpp/scripts/generate-vs2019.ps1",
+    "start": "electron .",
+    "test:native": "node scripts/test-native.cjs",
+    "pack": "npm run build && npm run build:native && electron-builder --dir --config electron-builder.config.cjs",
+    "dist": "npm run build && npm run build:native && electron-builder --config electron-builder.config.cjs",
+    "dist:win": "npm run build && npm run build:native && electron-builder --win nsis --config electron-builder.config.cjs",
+    "dist:mac": "npm run build && npm run build:native && electron-builder --mac dmg --config electron-builder.config.cjs",
+    "dist:linux": "npm run build && npm run build:native && electron-builder --linux AppImage --config electron-builder.config.cjs"
+  },
+  "dependencies": {
+    "koffi": "3.3.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue2": "2.3.4",
+    "electron": "45.0.0",
+    "electron-builder": "26.18.0",
+    "vite": "7.3.7",
+    "vue": "2.7.16"
+  }
+}
